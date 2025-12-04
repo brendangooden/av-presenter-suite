@@ -4,6 +4,8 @@ import { ref, reactive, watch, onMounted, onUnmounted } from 'vue'
 const MESSAGE_TYPES = {
   SET_STATE: 'SET_STATE',
   UPDATE_TIMER: 'UPDATE_TIMER',
+  PAUSE_TIMER: 'PAUSE_TIMER',
+  RESET_TIMER: 'RESET_TIMER',
   UPDATE_SCRIPT: 'UPDATE_SCRIPT',
   UPDATE_PLAYBACK: 'UPDATE_PLAYBACK',
   SET_MODE: 'SET_MODE',
@@ -116,7 +118,22 @@ export function useTeleprompterSync(role = 'control') {
         console.debug('[handleMessage] UPDATE_TIMER applied', { afterState: { elapsedMs: state.elapsedMs, isRunning: state.isTimerRunning } })
         break
         
+      case MESSAGE_TYPES.PAUSE_TIMER:
+        console.debug('[handleMessage] PAUSE_TIMER received', { payload: message.payload })
+        state.isTimerRunning = false
+        state.elapsedMs = message.payload.elapsedMs
+        state.timerStartTime = null
+        break
+        
+      case MESSAGE_TYPES.RESET_TIMER:
+        console.debug('[handleMessage] RESET_TIMER received')
+        state.isTimerRunning = false
+        state.elapsedMs = 0
+        state.timerStartTime = null
+        break
+        
       case MESSAGE_TYPES.UPDATE_SCRIPT:
+        console.debug('[handleMessage] UPDATE_SCRIPT received', { payload: message.payload })
         state.selectedPresenterId = message.payload.selectedPresenterId
         const presenter = state.presenters.find(p => p.id === message.payload.selectedPresenterId)
         if (presenter && message.payload.script !== undefined) {
@@ -125,14 +142,17 @@ export function useTeleprompterSync(role = 'control') {
         break
         
       case MESSAGE_TYPES.UPDATE_PLAYBACK:
+        console.debug('[handleMessage] UPDATE_PLAYBACK received', { payload: message.payload })
         Object.assign(state, message.payload)
         break
         
       case MESSAGE_TYPES.SET_MODE:
+        console.debug('[handleMessage] SET_MODE received', { payload: message.payload })
         state.mode = message.payload.mode
         break
         
       case MESSAGE_TYPES.PUSH_MESSAGE:
+        console.debug('[handleMessage] PUSH_MESSAGE received', { payload: message.payload })
         state.currentMessage = {
           text: message.payload.text,
           type: message.payload.type || 'info',
@@ -142,16 +162,19 @@ export function useTeleprompterSync(role = 'control') {
         break
         
       case MESSAGE_TYPES.CLEAR_MESSAGE:
+        console.debug('[handleMessage] CLEAR_MESSAGE received', { payload: message.payload })
         if (!message.payload.id || state.currentMessage.id === message.payload.id) {
           state.currentMessage.visible = false
         }
         break
         
       case MESSAGE_TYPES.UPDATE_PRESENTERS:
+        console.debug('[handleMessage] UPDATE_PRESENTERS received', { payload: message.payload })
         state.presenters = message.payload.presenters
         break
         
       case MESSAGE_TYPES.SELECT_PRESENTER:
+        console.debug('[handleMessage] SELECT_PRESENTER received', { payload: message.payload })
         state.selectedPresenterId = message.payload.id
         break
     }
@@ -348,8 +371,8 @@ export function useTeleprompterSync(role = 'control') {
       state.timerStartTime = null
       if (isControl) {
         sendMessage({
-          type: MESSAGE_TYPES.UPDATE_TIMER,
-          payload: { isTimerRunning: false, elapsedMs: currentElapsed, timerStartTime: null }
+          type: MESSAGE_TYPES.PAUSE_TIMER,
+          payload: { elapsedMs: currentElapsed }
         })
       }
     },
@@ -363,8 +386,8 @@ export function useTeleprompterSync(role = 'control') {
       if (isControl) {
         console.debug('[resetTimer] Broadcasting reset to other windows')
         sendMessage({
-          type: MESSAGE_TYPES.UPDATE_TIMER,
-          payload: { isTimerRunning: false, elapsedMs: 0, timerStartTime: null }
+          type: MESSAGE_TYPES.RESET_TIMER,
+          payload: {}
         })
       }
       console.debug('[resetTimer] Reset complete', { elapsedMs: state.elapsedMs, isRunning: state.isTimerRunning })

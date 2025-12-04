@@ -163,7 +163,6 @@ const handleStartPause = () => {
 }
 
 const handleReset = () => {
-  localElapsed.value = 0
   emit('reset')
 }
 
@@ -194,10 +193,10 @@ watch(() => props.isRunning, (isRunning) => {
   }
 })
 
-// Sync elapsed from props when not running OR when explicitly reset to 0
+// Sync elapsed from props when timer is not running
 watch(() => props.elapsedMs, (newVal, oldVal) => {
-  console.debug('[TimerDisplay] elapsedMs prop changed', { oldVal, newVal, isRunning: props.isRunning, willUpdate: !props.isRunning || newVal === 0 })
-  if (!props.isRunning || newVal === 0) {
+  console.debug('[TimerDisplay] elapsedMs prop changed', { oldVal, newVal, isRunning: props.isRunning })
+  if (!props.isRunning) {
     localElapsed.value = newVal
     console.debug('[TimerDisplay] Updated localElapsed', { localElapsed: localElapsed.value })
     // Clear start timestamp when reset to 0
@@ -208,11 +207,15 @@ watch(() => props.elapsedMs, (newVal, oldVal) => {
   }
 })
 
-// Sync start time from props
-watch(() => props.timerStartTime, (newVal) => {
+// Sync start time from props when timer starts
+watch(() => props.timerStartTime, (newVal, oldVal) => {
+  console.debug('[TimerDisplay] timerStartTime changed', { oldVal, newVal, isRunning: props.isRunning })
+  
   if (newVal !== null && props.isRunning) {
+    // Sync with the provided start time
     startTimeStamp.value = newVal
     localElapsed.value = Date.now() - newVal
+    console.debug('[TimerDisplay] Synced with timerStartTime', { startTimeStamp: startTimeStamp.value, localElapsed: localElapsed.value })
   }
 })
 
