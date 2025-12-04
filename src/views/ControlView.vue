@@ -245,7 +245,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useTeleprompterSync } from '../composables/useTeleprompterSync'
 import PresenterList from '../components/PresenterList.vue'
@@ -274,6 +274,13 @@ const fontSize = ref(sync.state.fontSize)
 // Message controls
 const messageText = ref('')
 const messageType = ref('info')
+
+// Keep selectedMode in sync with state
+watch(() => sync.state.mode, (newMode) => {
+  if (newMode && selectedMode.value !== newMode) {
+    selectedMode.value = newMode
+  }
+}, { immediate: true })
 
 const selectedPresenter = computed(() => {
   return sync.state.presenters.find(p => p.id === sync.state.selectedPresenterId)
