@@ -1,6 +1,8 @@
 # AV Presenter Suite
 
-A professional teleprompter application built with Vue 3 and Vite, designed for static deployment on platforms like Netlify or Vercel. Features dual-window operation with cross-window synchronization, multiple operational modes, timer system, and live messaging, for use in live broadcast and audio visual setups. 
+A professional teleprompter application built with Vue 3 and Vite, designed for static deployment on platforms like Netlify or Vercel. Features dual-window operation with cross-window synchronization, multiple operational modes, timer system, and live messaging, for use in live broadcast and audio visual setups.
+
+**Live Demo**: [https://av-presenter.netlify.app](https://av-presenter.netlify.app) 
 
 ## Features
 
