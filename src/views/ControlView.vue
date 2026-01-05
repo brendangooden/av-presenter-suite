@@ -241,6 +241,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; {{ new Date().getFullYear() }} Brendan Gooden. 
+        <a href="https://github.com/brendangooden/av-presenter-suite" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+      </p>
+    </footer>
   </div>
 </template>
 
@@ -869,5 +876,35 @@ onUnmounted(() => {
   .mode-tabs {
     flex-direction: column;
   }
+}
+
+/* Footer styles */
+.app-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem 1rem;
+  background: #0a0a0a;
+  border-top: 1px solid #333;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #666;
+  z-index: 10;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+.app-footer a {
+  color: #3b82f6;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.app-footer a:hover {
+  color: #60a5fa;
+  text-decoration: underline;
 }
 </style>
