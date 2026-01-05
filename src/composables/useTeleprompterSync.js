@@ -22,7 +22,8 @@ const createInitialState = () => ({
     { 
       id: 1, 
       name: 'Sample Presenter', 
-      script: 'Welcome to the teleprompter!\n\nThis is where your script text will appear.\n\nYou can scroll through it smoothly, adjust the speed, and control playback with the buttons below.\n\nAdd your own presenters and scripts using the menu on the left.' 
+      script: 'Welcome to the teleprompter!\n\nThis is where your script text will appear.\n\nYou can scroll through it smoothly, adjust the speed, and control playback with the buttons below.\n\nAdd your own presenters and scripts using the menu on the left.',
+      timerDurationMs: null
     }
   ],
   selectedPresenterId: 1,

@@ -251,6 +251,7 @@ const isNewPresenter = ref(false)
 const notification = ref(null)
 const confirmDialog = ref(null)
 const fileInputRef = ref(null)
+const lastAppliedTimer = ref({ presenterId: null, durationMs: null })
 
 const speed = ref(sync.state.speed)
 const fontSize = ref(sync.state.fontSize)
@@ -269,6 +270,32 @@ const hasScript = computed(() => {
 })
 
 const autoMode = computed(() => hasScript.value ? 'combined' : 'timer')
+
+watch(selectedPresenter, (presenter) => {
+  if (!presenter) return
+  const normalizedDuration = typeof presenter.timerDurationMs === 'number' && presenter.timerDurationMs > 0
+    ? presenter.timerDurationMs
+    : null
+
+  const prev = lastAppliedTimer.value
+  const hasChanged = prev.presenterId !== presenter.id || prev.durationMs !== normalizedDuration
+  if (!hasChanged) return
+
+  lastAppliedTimer.value = { presenterId: presenter.id, durationMs: normalizedDuration }
+
+  if (normalizedDuration) {
+    if (sync.state.timerMode !== 'down') {
+      sync.setTimerMode('down')
+    }
+    if (sync.state.durationMs !== normalizedDuration) {
+      sync.setTimerDuration(normalizedDuration)
+    }
+  } else if (sync.state.timerMode !== 'up') {
+    sync.setTimerMode('up')
+  }
+
+  sync.resetTimer()
+}, { immediate: true })
 
 // Open program view
 const openProgramView = () => {
