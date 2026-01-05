@@ -100,15 +100,17 @@ const durationMinutes = computed(() => Math.floor(props.durationMs / 60000))
 const durationSeconds = computed(() => Math.floor((props.durationMs % 60000) / 1000))
 
 const formatTime = (ms) => {
-  const totalSeconds = Math.floor(ms / 1000)
+  const isNegative = ms < 0
+  const totalSeconds = Math.floor(Math.abs(ms) / 1000)
   const hours = Math.floor(totalSeconds / 3600)
   const minutes = Math.floor((totalSeconds % 3600) / 60)
   const seconds = totalSeconds % 60
 
-  if (hours > 0) {
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
-  }
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  const formatted = hours > 0
+    ? `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+    : `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+
+  return isNegative ? `-${formatted}` : formatted
 }
 
 const formattedTime = computed(() => {
@@ -117,15 +119,10 @@ const formattedTime = computed(() => {
     if (!props.isRunning && localElapsed.value === 0) {
       return formatTime(props.durationMs)
     }
-    const remaining = Math.max(0, props.durationMs - localElapsed.value)
+    const remaining = props.durationMs - localElapsed.value
     return formatTime(remaining)
   }
   return formatTime(localElapsed.value)
-})
-
-const formattedRemaining = computed(() => {
-  const remaining = Math.max(0, props.durationMs - localElapsed.value)
-  return formatTime(remaining)
 })
 
 const timerClass = computed(() => {
