@@ -34,8 +34,8 @@ const createInitialState = () => ({
   scrollPosition: null,
   
   // Timer state
-  timerMode: 'up', // 'up' or 'down'
-  durationMs: 300000, // 5 minutes default for countdown
+  timerMode: 'down', // 'up' or 'down'
+  durationMs: 600000, // 10 minutes default for countdown
   elapsedMs: 0,
   isTimerRunning: false,
   timerStartTime: null,
