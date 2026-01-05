@@ -60,30 +60,6 @@
           {{ showMenu ? '◀ Hide Sidebar' : '▶ Show Sidebar' }}
         </button>
 
-        <div class="mode-selector-top">
-          <label>Display Mode:</label>
-          <div class="mode-tabs">
-            <button 
-              @click="() => { selectedMode = 'timer'; handleModeChange(); }"
-              :class="['mode-tab', { active: selectedMode === 'timer' }]"
-            >
-              ⏱️ Timer
-            </button>
-            <button 
-              @click="() => { selectedMode = 'autocue'; handleModeChange(); }"
-              :class="['mode-tab', { active: selectedMode === 'autocue' }]"
-            >
-              📜 Teleprompter
-            </button>
-            <button 
-              @click="() => { selectedMode = 'combined'; handleModeChange(); }"
-              :class="['mode-tab', { active: selectedMode === 'combined' }]"
-            >
-              ⏱️📜 Combined
-            </button>
-          </div>
-        </div>
-
         <div class="presenter-badge">
           <span class="badge-label">Current:</span>
           <span class="badge-name">{{ selectedPresenter?.name || 'None' }}</span>
@@ -91,7 +67,7 @@
       </div>
 
       <!-- Timer Controls Section -->
-      <div v-if="selectedMode === 'timer' || selectedMode === 'combined'" class="control-section timer-section">
+      <div class="control-section timer-section">
         <div class="section-header-inline">
           <h3>⏱️ Timer</h3>
         </div>
@@ -102,7 +78,7 @@
           :is-running="sync.state.isTimerRunning"
           :timer-start-time="sync.state.timerStartTime"
           :show-controls="true"
-          :size="selectedMode === 'timer' ? 'large' : 'medium'"
+          :size="autoMode === 'timer' ? 'large' : 'medium'"
           @start="sync.startTimer"
           @pause="sync.pauseTimer"
           @reset="sync.resetTimer"
@@ -112,7 +88,7 @@
       </div>
 
       <!-- Teleprompter Section -->
-      <div v-if="selectedMode === 'autocue' || selectedMode === 'combined'" class="control-section teleprompter-section">
+      <div v-if="autoMode === 'combined'" class="control-section teleprompter-section">
         <div class="section-header-inline">
           <h3>📜 Teleprompter</h3>
           
@@ -276,7 +252,6 @@ const notification = ref(null)
 const confirmDialog = ref(null)
 const fileInputRef = ref(null)
 
-const selectedMode = ref(sync.state.mode)
 const speed = ref(sync.state.speed)
 const fontSize = ref(sync.state.fontSize)
 
@@ -284,16 +259,16 @@ const fontSize = ref(sync.state.fontSize)
 const messageText = ref('')
 const messageType = ref('info')
 
-// Keep selectedMode in sync with state
-watch(() => sync.state.mode, (newMode) => {
-  if (newMode && selectedMode.value !== newMode) {
-    selectedMode.value = newMode
-  }
-}, { immediate: true })
-
 const selectedPresenter = computed(() => {
   return sync.state.presenters.find(p => p.id === sync.state.selectedPresenterId)
 })
+
+const hasScript = computed(() => {
+  const script = selectedPresenter.value?.script
+  return !!script && script.trim().length > 0
+})
+
+const autoMode = computed(() => hasScript.value ? 'combined' : 'timer')
 
 // Open program view
 const openProgramView = () => {
@@ -311,11 +286,6 @@ const showNotification = (message) => {
 // Role switching
 const switchRole = (newRole) => {
   router.push({ name: newRole === 'control' ? 'Control' : 'Program' })
-}
-
-// Mode change
-const handleModeChange = () => {
-  sync.setMode(selectedMode.value)
 }
 
 // Timer runs independently now - no tick handler needed
@@ -421,7 +391,6 @@ const handleImport = (event) => {
     try {
       const data = JSON.parse(e.target.result)
       sync.importData(data)
-      selectedMode.value = sync.state.mode
       showNotification(`Imported ${data.presenters?.length || 0} presenter(s) successfully!`)
     } catch (error) {
       showNotification('Error reading file: ' + error.message)
@@ -591,52 +560,6 @@ onUnmounted(() => {
   background: #1a1a1a;
   border-bottom: 2px solid #333;
   flex-shrink: 0;
-}
-
-.mode-selector-top {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.mode-selector-top label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #999;
-  white-space: nowrap;
-}
-
-.mode-tabs {
-  display: flex;
-  gap: 0.5rem;
-  background: #0a0a0a;
-  padding: 0.25rem;
-  border-radius: 8px;
-}
-
-.mode-tab {
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  color: #999;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.mode-tab:hover {
-  color: #fff;
-  background: #1a1a1a;
-}
-
-.mode-tab.active {
-  background: #2563eb;
-  color: #fff;
-  border-color: #3b82f6;
 }
 
 .presenter-badge {
@@ -883,13 +806,6 @@ onUnmounted(() => {
     gap: 1rem;
   }
   
-  .mode-selector-top {
-    flex-direction: column;
-  }
-  
-  .mode-tabs {
-    flex-direction: column;
-  }
 }
 
 /* Footer styles */

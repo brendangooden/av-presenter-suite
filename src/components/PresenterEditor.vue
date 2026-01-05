@@ -22,7 +22,7 @@
           <label>Script</label>
           <textarea
             v-model="localPresenter.script"
-            placeholder="Enter script text here..."
+            placeholder="Enter presenter script text here... Teleprompter mode will automatically be enabled during presentation."
             class="form-textarea"
           ></textarea>
         </div>

@@ -1,7 +1,7 @@
 <template>
   <div class="program-view" :class="modeClass">
     <!-- Timer Only Mode -->
-    <div v-if="sync.state.mode === 'timer'" class="timer-only-layout">
+    <div v-if="autoMode === 'timer'" class="timer-only-layout">
       <div class="presenter-info">
         {{ selectedPresenter?.name || 'No Presenter Selected' }}
       </div>
@@ -13,35 +13,6 @@
         :timer-start-time="sync.state.timerStartTime"
         :show-controls="false"
         size="xlarge"
-      />
-      <MessageBanner
-        v-if="sync.state.currentMessage.visible"
-        :message="sync.state.currentMessage.text"
-        :type="sync.state.currentMessage.type"
-      />
-    </div>
-
-    <!-- Teleprompter Only Mode -->
-    <div v-else-if="sync.state.mode === 'autocue'" class="autocue-only-layout">
-      <div class="timer-bar">
-        <TimerDisplay
-          :elapsed-ms="sync.state.elapsedMs"
-          :duration-ms="sync.state.durationMs"
-          :timer-mode="sync.state.timerMode"
-          :is-running="sync.state.isTimerRunning"
-          :timer-start-time="sync.state.timerStartTime"
-          :show-controls="false"
-          size="small"
-        />
-      </div>
-      <TeleprompterDisplay
-        :script="selectedPresenter?.script || ''"
-        :font-size="sync.state.fontSize"
-        :is-playing="sync.state.isPlaying"
-        :speed="sync.state.speed"
-        :scroll-position="sync.state.scrollPosition"
-        :show-controls="false"
-        class="teleprompter-main"
       />
       <MessageBanner
         v-if="sync.state.currentMessage.visible"
@@ -98,7 +69,14 @@ const selectedPresenter = computed(() => {
   return sync.state.presenters.find(p => p.id === sync.state.selectedPresenterId)
 })
 
-const modeClass = computed(() => `mode-${sync.state.mode}`)
+const hasScript = computed(() => {
+  const script = selectedPresenter.value?.script
+  return !!script && script.trim().length > 0
+})
+
+const autoMode = computed(() => hasScript.value ? 'combined' : 'timer')
+
+const modeClass = computed(() => `mode-${autoMode.value}`)
 
 // Keyboard controls for spacebar
 const handleKeyDown = (e) => {
@@ -148,27 +126,6 @@ onUnmounted(() => {
   color: #666;
   text-align: center;
   width: 100%;
-}
-
-/* Autocue Only Layout */
-.autocue-only-layout {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
-
-.timer-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 0.5rem 1rem;
-  display: flex;
-  justify-content: center;
 }
 
 .teleprompter-main {
