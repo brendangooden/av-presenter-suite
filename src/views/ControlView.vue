@@ -1,7 +1,8 @@
 <template>
   <div class="control-view">
-    <!-- Left Sidebar -->
-    <div v-if="showMenu" class="sidebar">
+    <div class="control-layout">
+      <!-- Left Sidebar -->
+      <div v-if="showMenu" class="sidebar">
       <!-- Branding & Quick Actions -->
       <div class="sidebar-header">        
         <button 
@@ -49,10 +50,10 @@
           style="display: none"
         />
       </div>
-    </div>
+      </div>
 
-    <!-- Main Content Area -->
-    <div class="main-content">
+      <!-- Main Content Area -->
+      <div class="main-content">
       <!-- Top Control Bar -->
       <div class="top-bar">
         <button @click="showMenu = !showMenu" class="btn btn-secondary">
@@ -208,6 +209,7 @@
             {{ sync.state.currentMessage.type }}
           </span>
         </div>
+      </div>
       </div>
     </div>
 
@@ -469,9 +471,16 @@ onUnmounted(() => {
 <style scoped>
 .control-view {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   background: #000;
   color: #fff;
+}
+
+.control-layout {
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }
 
 /* === SIDEBAR === */
@@ -481,6 +490,7 @@ onUnmounted(() => {
   border-right: 1px solid #333;
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .sidebar-header {
@@ -568,6 +578,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
   background: #0a0a0a;
 }
 
@@ -579,6 +590,7 @@ onUnmounted(() => {
   padding: 1rem 1.5rem;
   background: #1a1a1a;
   border-bottom: 2px solid #333;
+  flex-shrink: 0;
 }
 
 .mode-selector-top {
@@ -654,6 +666,7 @@ onUnmounted(() => {
 .control-section {
   padding: 1.5rem;
   border-bottom: 1px solid #333;
+  flex-shrink: 0;
 }
 
 .section-header-inline {
@@ -713,15 +726,16 @@ onUnmounted(() => {
 }
 
 .teleprompter-section {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 300px;
+  min-height: 0;
 }
 
 .teleprompter-preview {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid #333;
   border-radius: 8px;
@@ -880,17 +894,14 @@ onUnmounted(() => {
 
 /* Footer styles */
 .app-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-shrink: 0;
+  width: 100%;
   padding: 0.75rem 1rem;
   background: #0a0a0a;
   border-top: 1px solid #333;
   text-align: center;
   font-size: 0.75rem;
   color: #666;
-  z-index: 10;
 }
 
 .app-footer p {
